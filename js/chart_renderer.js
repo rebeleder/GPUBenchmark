@@ -93,8 +93,10 @@ async function renderChart(options) {
                     right: '50px',
                     bottom: '50px',
                     style: {
-                        text: '魔梨沙@bilibili制作\n\n2025年7月29日',
-                        textAlign: 'right'
+                        text: '魔梨沙@bilibili制作\n2025年7月29日',
+                        textAlign: 'right',
+                        fill: '#ccc',
+                        fontSize: 24
                     }
                 }]
             },
