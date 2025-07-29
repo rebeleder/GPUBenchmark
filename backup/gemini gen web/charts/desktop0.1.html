@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>消费级显卡Timespy天梯表（桌面端）</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main" style="width: 1200px;height:4000px;"></div>
+
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 使用 fetch 加载外部 JSON 文件
+        fetch('./data.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // ==========================================================
+                //  成功获取数据！所有使用 "data" 的代码都必须放在这里
+                // ==========================================================
+
+                // 1. 数据处理
+                const baseScore = data["NVIDIA GeForce GTX 1060-6GB"];
+                let processedData = Object.entries(data).map(([name, score]) => {
+                    return {
+                        name: name,
+                        value: score,
+                        percentage: (score / baseScore * 100).toFixed(0) + '%'
+                    };
+                });
+
+                // 2. 按分数升序排序（倒序）
+                processedData.sort((a, b) => a.value - b.value);
+
+                // 3. 提取排序后的名称和分数
+                const sortedNames = processedData.map(item => item.name);
+                const sortedScores = processedData.map(item => item.value);
+
+                // ECharts 配置
+                var option = {
+                    title: {
+                        text: '消费级显卡Timespy天梯表（桌面端）',
+                        left: 'center',
+                        top: '20px',
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 24,
+                            fontWeight: 'bold'
+                        }
+                    },
+                    // 在 Canvas 内部绘制署名
+                    graphic: {
+                        elements: [
+                            {
+                                type: 'text',
+                                right: '50px',
+                                bottom: '30px',
+                                style: {
+                                    text: '魔梨沙@bilibili制作\n2025年7月27日',
+                                    textAlign: 'right',
+                                    fill: '#ccc',
+                                    fontSize: 16
+                                }
+                            }
+                        ]
+                    },
+                    backgroundColor: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#2a2a2a' },
+                        { offset: 1, color: '#000000' }
+                    ]),
+                    // tooltip: {
+                    //     trigger: 'axis',
+                    //     axisPointer: { type: 'shadow' },
+                    //     formatter: function (params) {
+                    //         const data = params[0];
+                    //         const baseInfo = `NVIDIA GeForce GTX 1060-6GB: ${baseScore}`;
+                    //         const percentage = (data.value / baseScore * 100).toFixed(2) + '%';
+                    //         return `${data.name}<br/>分数: <strong>${data.value}</strong><br/>百分比: <strong>${percentage}</strong><br/>(${baseInfo})`;
+                    //     }
+                    // },
+                    grid: {
+                        left: '250px',
+                        right: '80px',
+                        top: '100px',
+                        bottom: '80px', // 增加下边距给署名留出空间
+                        containLabel: false
+                    },
+                    xAxis: {
+                        type: 'value',
+                        position: 'top',
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#444',
+                                type: 'dashed'
+                            }
+                        },
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                                    { offset: 0, color: '#ffff99' },
+                                    { offset: 1, color: '#76B900' }
+                                ])
+                            }
+                        },
+                        axisLabel: { color: '#ffff99', fontWeight: 'bold' },
+                        axisTick: { show: true, lineStyle: { color: '#ffff99' } },
+                        interval: 5000
+                    },
+                    yAxis: {
+                        type: 'category',
+                        data: sortedNames,
+                        axisLabel: {
+                            color: '#ffff99',
+                            align: 'right',
+                            padding: [0, 10, 0, 0],
+                            fontWeight: 'bold',
+                        },
+                        axisLine: { show: false },
+                        axisTick: { show: false }
+                    },
+                    series: [
+                        {
+                            name: '分数',
+                            type: 'bar',
+                            // Z-level to ensure this bar is below the percentage label bar
+                            z: 1,
+                            data: sortedScores,
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                                    { offset: 0, color: '#ffff99' },
+                                    { offset: 1, color: '#76B900' }
+                                ])
+                            },
+                            label: {
+                                show: true,
+                                position: 'insideLeft',
+                                formatter: '{c}',
+                                color: '#000',
+                                fontWeight: 'bold',
+                            }
+                        },
+                        {
+                            name: '百分比',
+                            type: 'bar',
+                            //  =========>  这就是解决问题的关键代码  <=========
+                            barGap: '-100%',
+                            // ===============================================
+                            // Z-level to ensure labels are on top
+                            z: 2,
+                            data: sortedScores,
+                            itemStyle: { color: 'transparent' },
+                            label: {
+                                show: true,
+                                position: 'right',
+                                formatter: function (params) {
+                                    return (params.value / baseScore * 100).toFixed(0) + '%';
+                                },
+                                color: '#fff',
+                                fontWeight: 'bold'
+                            }
+                        }
+                    ]
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            })
+            .catch(error => {
+                console.error('加载图表数据失败:', error);
+                document.getElementById('main').innerText = '错误：无法加载图表数据。请检查文件路径或网络连接。';
+            });
+    </script>
+</body>
+
+</html>

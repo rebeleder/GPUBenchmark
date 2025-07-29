@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Time Spy 桌面端显卡天梯图</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(to bottom, #1a1c20, #000000);
+            color: rgb(0, 0, 0);
+            font-family: sans-serif;
+        }
+
+        h2 {
+            text-align: center;
+            padding: 1.5rem;
+            margin: 0;
+            font-size: 2rem;
+            color: #fdeb71;
+        }
+
+        #main {
+            width: 100%;
+            min-height: 400px;
+            /* 设置最小高度 */
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Time Spy 桌面端显卡天梯图</h2>
+    <div id="main"></div>
+    <!-- 用于搜索的列表 -->
+    <div id="searchable-list" style="position: absolute; left: -9999px; top: -9999px;"></div>
+    <script src="main.js"></script>
+</body>
+
+</html>
